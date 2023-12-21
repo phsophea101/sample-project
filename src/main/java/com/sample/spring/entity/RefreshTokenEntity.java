@@ -18,7 +18,7 @@ import java.io.Serializable;
 @FieldNameConstants
 @Document(collection = RefreshTokenEntity.TABLE_NAME)
 public class RefreshTokenEntity extends AuditEntity implements RecyclableEntity<String>, Serializable {
-    public static final String TABLE_NAME = "refresh_tokens";
+    public static final String TABLE_NAME = "oauth_refresh_tokens";
     @Field("token_id")
     private String tokenId;
     @Field("oauth2_refresh_token")

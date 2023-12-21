@@ -3,6 +3,7 @@ package com.sample.spring.mapper;
 import com.sample.spring.dto.RefreshTokenDto;
 import com.sample.spring.entity.RefreshTokenEntity;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
@@ -14,4 +15,6 @@ public interface RefreshTokenMapper {
     RefreshTokenDto entityToDto(RefreshTokenEntity entity);
 
     RefreshTokenEntity dtoToEntity(RefreshTokenDto refreshTokenDto);
+
+    void entityToEntity(RefreshTokenEntity entityA, @MappingTarget RefreshTokenEntity entityB);
 }

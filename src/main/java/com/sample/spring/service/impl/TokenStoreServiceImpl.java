@@ -55,7 +55,7 @@ public class TokenStoreServiceImpl implements TokenStore {
             dto.setOAuth2AccessToken(token);
             dto.setAuthenticationId(this.authenticationKeyGenerator.extractKey(authentication));
             AccessTokenEntity entity = AccessTokenMapper.INSTANCE.dtoToEntity(dto);
-            this.accessTokenRepository.save(entity);
+            this.accessTokenRepository.create(entity);
         }
     }
 
@@ -82,7 +82,7 @@ public class TokenStoreServiceImpl implements TokenStore {
         refreshTokenDto.setTokenId(refreshToken.getValue());
         refreshTokenDto.setOAuth2RefreshToken(refreshToken);
         refreshTokenDto.setAuthentication(authentication);
-        this.refreshTokenRepository.save(RefreshTokenMapper.INSTANCE.dtoToEntity(refreshTokenDto));
+        this.refreshTokenRepository.create(RefreshTokenMapper.INSTANCE.dtoToEntity(refreshTokenDto));
     }
 
     @Override

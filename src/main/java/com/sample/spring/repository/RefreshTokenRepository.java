@@ -7,7 +7,7 @@ public interface RefreshTokenRepository {
 
     RefreshTokenEntity findByTokenId(String tokenId);
 
-    void save(RefreshTokenEntity entity);
+    void create(RefreshTokenEntity entity);
 
     void delete(RefreshTokenEntity entity);
 }

@@ -19,7 +19,7 @@ import java.io.Serializable;
 @FieldNameConstants
 @Document(collection = AccessTokenEntity.TABLE_NAME)
 public class AccessTokenEntity extends AuditEntity implements RecyclableEntity<String>, Serializable {
-    public static final String TABLE_NAME = "access_tokens";
+    public static final String TABLE_NAME = "oauth_access_tokens";
     @Field("token_id")
     private String tokenId;
     @Field("oauth2_access_token")

@@ -7,4 +7,7 @@ public interface ClientDetailRepository {
 
     ClientDetailEntity findClientByClientId(String clientId);
 
+    void create(ClientDetailEntity entity);
+
+    void update(String clientId, ClientDetailEntity entity);
 }

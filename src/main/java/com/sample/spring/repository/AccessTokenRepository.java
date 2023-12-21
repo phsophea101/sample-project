@@ -8,7 +8,7 @@ public interface AccessTokenRepository {
 
     AccessTokenEntity findByTokenId(String tokenId);
 
-    void save(AccessTokenEntity entity);
+    void create(AccessTokenEntity entity);
 
     AccessTokenEntity findByRefreshToken(String refreshToken);
 

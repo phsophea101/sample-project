@@ -3,6 +3,7 @@ package com.sample.spring.mapper;
 import com.sample.spring.dto.ClientDetailDto;
 import com.sample.spring.entity.ClientDetailEntity;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
@@ -13,6 +14,8 @@ public interface ClientDetailMapper {
     ClientDetailMapper INSTANCE = Mappers.getMapper(ClientDetailMapper.class);
 
     BaseClientDetails entityToDto(ClientDetailEntity entity);
+
+    void entityToEntity(ClientDetailEntity entityA, @MappingTarget ClientDetailEntity entityB);
 
     ClientDetailDto to(ClientDetailEntity entity);
 
