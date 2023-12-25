@@ -15,7 +15,6 @@ import java.io.Serializable;
 public class PermissionEntity extends AuditEntity implements RecyclableEntity<String>, Serializable {
     public static final String TABLE_NAME = "roles";
     private String code;
-    @Field("label_display")
-    private String labelDisplay;
+    private String label;
     private String status;
 }

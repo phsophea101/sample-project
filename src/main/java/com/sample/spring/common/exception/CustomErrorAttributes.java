@@ -4,6 +4,7 @@ import com.sample.spring.common.util.ContextUtil;
 import com.sample.spring.common.util.I18nUtils;
 import com.sample.spring.enums.SystemType;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.actuate.endpoint.InvalidEndpointRequestException;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
@@ -11,7 +12,6 @@ import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.oauth2.common.exceptions.UnauthorizedClientException;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.WebRequest;
 
@@ -31,27 +31,28 @@ public class CustomErrorAttributes extends DefaultErrorAttributes {
         String path = (String) map.get(SystemType.PATH.getValue());
         message = StringUtils.isEmpty(message) ? (String) map.get(SystemType.ERROR.getValue()) : message;
         String code = String.format("E0%s", status);
-        if (exception instanceof BizException) {
-            code = ((BizException) exception).getError().getValue();
-            message = ((Exception) exception).getMessage();
-        } else
-            message = I18nUtils.messageResolver(code, message);
         Map<String, Object> response = new HashMap<>();
         Map<String, Object> error = new HashMap<>();
         Map<String, Object> errorDetail = new HashMap<>();
-        error.put(SystemType.CODE.getValue(), code);
-        error.put(SystemType.MESSAGE.getValue(), message);
-        errorDetail.put(SystemType.PATH.getValue(), path);
         errorDetail.put(SystemType.DESCRIPTION.getValue(), message);
-        if ((exception instanceof Exception)) {
-            errorDetail.put(SystemType.DESCRIPTION.getValue(), ((Exception) exception).getLocalizedMessage());
+        if (exception instanceof BizException) {
+            code = ((BizException) exception).getError().getValue();
+            message = ((BizException) exception).getError().getDescription();
+        } else if ((exception instanceof Exception)) {
+            String localizedMessage = ((Exception) exception).getLocalizedMessage();
+            if (ObjectUtils.isNotEmpty(localizedMessage))
+                errorDetail.put(SystemType.MESSAGE.getValue(), localizedMessage);
             errorDetail.put(SystemType.EXCEPTION.getValue(), ((Exception) exception).getClass().getSimpleName());
         } else if (HttpStatus.NOT_FOUND.value() == status)
             errorDetail.put(SystemType.EXCEPTION.getValue(), InvalidEndpointRequestException.class.getSimpleName());
         else if (HttpStatus.UNAUTHORIZED.value() == status)
-            errorDetail.put(SystemType.EXCEPTION.getValue(), UnauthorizedClientException.class.getSimpleName());
+            errorDetail.put(SystemType.EXCEPTION.getValue(), "UnauthorizedClientException");
         if (!errorDetail.get(SystemType.DESCRIPTION.getValue()).toString().endsWith("."))
             errorDetail.put(SystemType.DESCRIPTION.getValue(), errorDetail.get(SystemType.DESCRIPTION.getValue()) + ".");
+        message = I18nUtils.messageResolver(code, message);
+        error.put(SystemType.CODE.getValue(), code);
+        error.put(SystemType.MESSAGE.getValue(), message);
+        errorDetail.put(SystemType.PATH.getValue(), path);
         response.put(SystemType.ERROR.getValue(), error);
         if (ContextUtil.isProfileTesting()) {
             errorDetail.putAll(error);

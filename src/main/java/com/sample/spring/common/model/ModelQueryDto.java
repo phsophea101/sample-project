@@ -3,31 +3,39 @@ package com.sample.spring.common.model;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Setter
 @Getter
 public class ModelQueryDto {
-    private String fieldName;
-    private QueryCondition condition;
-    private Object fieldValue;
-    private Integer rpp = 10;
-    private Integer page = 1;
-    private Integer offset;
+    private List<QueryModelDto> queries;
+    private List<String> fields;
+    private PageableDto pageable;
 
-    public int getOffset() {
-        return (getPage() - 1) * getRpp();
+    public ModelQueryDto() {
     }
 
-    public ModelQueryDto(String fieldName, QueryCondition condition, Object fieldValue, Integer rpp, Integer page) {
-        this.fieldName = fieldName;
-        this.condition = condition;
-        this.fieldValue = fieldValue;
-        this.rpp = rpp;
-        this.page = page;
+    public ModelQueryDto(PageableDto pageable) {
+        this.pageable = pageable;
     }
 
-    public ModelQueryDto(String fieldName, QueryCondition condition, Object fieldValue) {
-        this.fieldName = fieldName;
-        this.condition = condition;
-        this.fieldValue = fieldValue;
+    public ModelQueryDto(List<QueryModelDto> queries) {
+        this.queries = queries;
+    }
+
+    public ModelQueryDto(List<QueryModelDto> queries, List<String> fields) {
+        this.queries = queries;
+        this.fields = fields;
+    }
+
+    public ModelQueryDto(List<QueryModelDto> queries, List<String> fields, PageableDto pageable) {
+        this.queries = queries;
+        this.fields = fields;
+        this.pageable = pageable;
+    }
+
+    public ModelQueryDto(List<QueryModelDto> queries, PageableDto pageable) {
+        this.queries = queries;
+        this.pageable = pageable;
     }
 }

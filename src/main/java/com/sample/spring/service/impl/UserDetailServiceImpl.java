@@ -11,33 +11,47 @@ import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @AllArgsConstructor
 @Slf4j
 public class UserDetailServiceImpl implements UserService {
-    private final UserRepository userRepository;
+    private final UserRepository repository;
 
     @SneakyThrows
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEntity entity = this.userRepository.findByUsername(username);
+    public UserDto loadUserByUsername(String username)  {
+        UserEntity entity = this.repository.findByUsername(username);
         if (ObjectUtils.isEmpty(entity))
             throw new BizException(BizErrorCode.E0002);
-        return entity;
+        return UserMapper.INSTANCE.entityToDto(entity);
     }
 
     @SneakyThrows
     @Override
     public UserDto save(UserDto dto) {
-        UserEntity entity = this.userRepository.findByUsername(dto.getUsername());
+        UserEntity entity = this.repository.findByUsername(dto.getUsername());
         if (ObjectUtils.isNotEmpty(entity))
             throw new BizException(BizErrorCode.E0003, String.format("This username %s %s", dto.getUsername(), "already existed."));
         entity = UserMapper.INSTANCE.dtoToEntity(dto);
-        this.userRepository.save(entity);
+        this.repository.save(entity);
+        return UserMapper.INSTANCE.entityToDto(entity);
+    }
+
+    @Override
+    public List<UserDto> findByUsers() {
+        return UserMapper.INSTANCE.entityToDtoList(repository.findByUsers());
+    }
+
+    @SneakyThrows
+    @Override
+    public UserDto findById(String id) {
+        UserEntity entity = this.repository.findOneById(id);
+        if (ObjectUtils.isEmpty(entity))
+            throw new BizException(BizErrorCode.E0002);
         return UserMapper.INSTANCE.entityToDto(entity);
     }
 }

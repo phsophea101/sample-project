@@ -9,6 +9,8 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
@@ -21,4 +23,7 @@ public interface UserMapper {
 
     UserResponseVo dtoToVo(UserDto dto);
 
+    List<UserDto> entityToDtoList(List<UserEntity> byUsers);
+
+    List<UserResponseVo> dtoToVoList(List<UserDto> users);
 }

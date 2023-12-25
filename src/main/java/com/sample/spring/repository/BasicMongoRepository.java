@@ -2,15 +2,26 @@ package com.sample.spring.repository;
 
 import com.sample.spring.common.exception.BizException;
 import com.sample.spring.common.model.ModelQueryDto;
+import com.sample.spring.common.model.PageableDto;
+import com.sample.spring.common.model.QueryCondition;
+import com.sample.spring.common.model.QueryModelDto;
 import com.sample.spring.enums.BizErrorCode;
 import lombok.SneakyThrows;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.util.Assert;
 
-import java.util.List;
+import java.lang.reflect.Field;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class BasicMongoRepository<T> implements BasicRepository<T> {
 
@@ -36,41 +47,63 @@ public abstract class BasicMongoRepository<T> implements BasicRepository<T> {
 
     @Override
     public void removeByField(ModelQueryDto modelQuery) {
-        Query query = Query.query(this.generateQuery(modelQuery));
+        Query query = this.generateQuery(modelQuery);
         this.template.remove(query);
     }
 
     @Override
+    public void removeById(Object id) {
+        this.removeByField(new ModelQueryDto(List.of(new QueryModelDto(this.getPrimaryKey(), QueryCondition.IS, id))));
+    }
+
+    @Override
     public T findByField(ModelQueryDto modelQuery) {
-        Query query = Query.query(this.generateQuery(modelQuery));
+        Query query = this.generateQuery(modelQuery);
         return this.template.findOne(query, this.getEntityClass());
     }
 
     @Override
-    public T findByField(List<ModelQueryDto> modelQueries) {
-        Query query = new Query();
-        for (ModelQueryDto modelQuery : modelQueries) {
-            query.addCriteria(this.generateQuery(modelQuery));
-        }
-        return this.template.findOne(query, this.getEntityClass());
+    public T findById(Object id) {
+        return this.findByField(new ModelQueryDto(List.of(new QueryModelDto(this.getPrimaryKey(), QueryCondition.IS, id))));
     }
 
     @Override
     public List<T> findMany(ModelQueryDto modelQuery) {
-        Query query = Query.query(this.generateQuery(modelQuery));
+        Query query = this.generateQuery(modelQuery);
+        if (ObjectUtils.isNotEmpty(modelQuery.getPageable()))
+            query.with(this.generatePageable(modelQuery.getPageable()));
+        List<T> list = this.template.find(query, this.getEntityClass());
+        if (ObjectUtils.isEmpty(list))
+            return Collections.emptyList();
         return this.template.find(query, this.getEntityClass());
     }
 
     @Override
-    public List<T> findMany(List<ModelQueryDto> modelQueries) {
-        Query query = new Query();
-        for (ModelQueryDto modelQuery : modelQueries) {
-            query.addCriteria(this.generateQuery(modelQuery));
-        }
-        return this.template.find(query, this.getEntityClass());
+    public long count(ModelQueryDto modelQuery) {
+        Query query = this.generateQuery(modelQuery);
+        return this.template.count(query, this.getEntityClass());
     }
 
-    private Criteria generateQuery(ModelQueryDto modelQuery) {
+    private Query generateQuery(ModelQueryDto modelQuery) {
+        Query query = new Query();
+        if (ObjectUtils.isNotEmpty(modelQuery.getFields()))
+            modelQuery.getFields().forEach(field -> query.fields().include(field));
+        else
+            this.getStrFields().forEach(field -> query.fields().include(field));
+        if (ObjectUtils.anyNull(modelQuery, modelQuery.getQueries())) return query;
+        for (QueryModelDto q : modelQuery.getQueries()) {
+            Criteria criteria = this.getCriteria(q);
+            query.addCriteria(criteria);
+        }
+        return query;
+    }
+
+    private Pageable generatePageable(PageableDto pageable) {
+        Sort sort = ObjectUtils.isEmpty(pageable.getSort()) ? Sort.by(Sort.Direction.ASC, this.getStrFields().get(0)) : pageable.getSort();
+        return PageRequest.of(pageable.getPage() - 1, pageable.getRpp(), sort);
+    }
+
+    private Criteria getCriteria(QueryModelDto modelQuery) {
         Criteria criteria = new Criteria();
         switch (modelQuery.getCondition()) {
             case IS:
@@ -83,4 +116,31 @@ public abstract class BasicMongoRepository<T> implements BasicRepository<T> {
         return criteria;
     }
 
+    private List<String> getStrFields() {
+        return this.getFields().stream().map(field -> field.getName()).collect(Collectors.toList());
+    }
+
+    private String getPrimaryKey() {
+        Optional<Field> primaryKey = this.getFields().stream().filter(field -> Objects.nonNull(field.getAnnotation(Id.class))).findFirst();
+        if (primaryKey.isPresent())
+            return primaryKey.get().getName();
+        return StringUtils.EMPTY;
+    }
+
+    private List<Field> getFields() {
+        Set<Field> fields = new HashSet<>();
+        Class<?> current = this.getEntityClass();
+        while (ObjectUtils.isNotEmpty(current) && !("java.lang.Object".equalsIgnoreCase(current.getName()))) {
+            List<Field> declaredFields = List.of(current.getDeclaredFields());
+            if (ObjectUtils.isNotEmpty(current.getFields()))
+                declaredFields = new ArrayList<>(CollectionUtils.subtract(declaredFields, List.of(current.getFields())));
+            if (!declaredFields.isEmpty()) {
+                fields.addAll(declaredFields);
+            } else {
+                fields.addAll(Arrays.asList(current.getDeclaredFields()));
+            }
+            current = current.getSuperclass();
+        }
+        return new ArrayList<>(fields);
+    }
 }

@@ -15,14 +15,14 @@ public interface BasicRepository<T> {
 
     void update(T entity);
 
+    void removeById(Object id);
     void removeByField(ModelQueryDto modelQuery);
 
     T findByField(ModelQueryDto modelQuery);
-
-    T findByField(List<ModelQueryDto> modelQueries);
+    T findById(Object id);
 
     List<T> findMany(ModelQueryDto modelQuery);
+    long count(ModelQueryDto modelQuery);
 
-    List<T> findMany(List<ModelQueryDto> modelQueries);
 
 }
