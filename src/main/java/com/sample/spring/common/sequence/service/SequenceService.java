@@ -12,11 +12,11 @@ public interface SequenceService {
 
     String injectFieldWithSequenceValue(Object entity, String fieldName) throws NoSuchFieldException;
 
-    Long getCurrentSequence(String sequenceName, SequenceType sequenceType);
+    Long getCurrentSequence(String sequenceName, SequenceType sequenceType, boolean recycle);
 
     @SneakyThrows
-    default String generate(int numOfDigit, String sequenceName, String sequencePrefix, SequenceType sequenceType) {
-        Long current = this.getCurrentSequence(sequenceName, sequenceType);
+    default String generate(int numOfDigit, String sequenceName, String sequencePrefix, SequenceType sequenceType, boolean recycle) {
+        Long current = this.getCurrentSequence(sequenceName, sequenceType, recycle);
         String year = String.valueOf(Year.now()).substring(2);
         String dayOfYear = String.format("%03d", LocalDate.now().getDayOfYear());
         String sequence = String.format(String.format("%%0%dd", numOfDigit), current);

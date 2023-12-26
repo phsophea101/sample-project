@@ -68,8 +68,8 @@ public class MongoSequenceServiceImpl extends AbstractSequenceService {
                 int sequenceDigit = field.getAnnotation(InjectSequenceValue.class).sequenceDigit();
                 SequenceType sequenceType = field.getAnnotation(InjectSequenceValue.class).sequenceType();
                 if (field.isAnnotationPresent(Id.class))
-                    return this.generate(16, sequenceName, StringUtils.EMPTY, sequenceType);
-                return this.generate(sequenceDigit, sequenceName, sequencePrefix, sequenceType);
+                    return this.generate(16, sequenceName, StringUtils.EMPTY, sequenceType, Boolean.FALSE);
+                return this.generate(sequenceDigit, sequenceName, sequencePrefix, sequenceType, Boolean.TRUE);
             } else {
                 return String.valueOf(FieldUtils.readField(field, entity, true));
             }
@@ -80,19 +80,18 @@ public class MongoSequenceServiceImpl extends AbstractSequenceService {
     }
 
     @Override
-    public Long getCurrentSequence(String sequenceName, SequenceType sequenceType) {
+    public Long getCurrentSequence(String sequenceName, SequenceType sequenceType, boolean recycle) {
         Query query = new Query();
         query.addCriteria(Criteria.where(MongoSequenceEntity.Fields.seq).is(sequenceName));
-        this.template.findOne(query, MongoSequenceEntity.class);
         MongoSequenceEntity entity = this.template.findOne(query, MongoSequenceEntity.class);
         if (ObjectUtils.isEmpty(entity)) {
             entity = new MongoSequenceEntity();
             entity.setSeq(sequenceName);
             entity.setCreatedDate(new Date());
-            entity.setRecycle(Boolean.TRUE);
+            entity.setRecycle(recycle);
             entity.setIncrement(1L);
             entity.setCurrent(0L);
-            entity.setMax(999999L);
+            entity.setMax(999999999999999999L);
         } else if (entity.getCurrent().compareTo(entity.getMax()) >= 0 && Boolean.TRUE.equals(entity.getRecycle())) {
             entity.setCurrent(0L);
         } /*else if (entity.getCurrent().compareTo(entity.getMax()) >= 0 && Boolean.FALSE.equals(entity.getRecycle())) {
