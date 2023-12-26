@@ -1,10 +1,14 @@
 package com.sample.spring.common.sequence.service.impl;
 
 import com.google.common.base.CaseFormat;
+import com.sample.spring.common.model.ModelQueryDto;
+import com.sample.spring.common.model.QueryCondition;
+import com.sample.spring.common.model.QueryModelDto;
 import com.sample.spring.common.sequence.SequenceType;
 import com.sample.spring.common.sequence.annotation.InjectSequenceValue;
 import com.sample.spring.entity.AuditTrailEntity;
 import com.sample.spring.entity.MongoSequenceEntity;
+import com.sample.spring.repository.impl.SequenceRepositoryImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -29,7 +33,7 @@ import java.util.stream.Collectors;
 @ConditionalOnClass(value = {AbstractMongoEventListener.class, MongoTemplate.class})
 public class MongoSequenceServiceImpl extends AbstractSequenceService {
     private static final List<String> COLLECTION_IGNORES = List.of(StringUtils.EMPTY, MongoSequenceEntity.COLLECTION_NAME, AuditTrailEntity.TABLE_NAME);
-    protected final MongoTemplate template;
+    protected final SequenceRepositoryImpl repository;
 
     private List<Field> getAllFields(Class<?> clazz) {
         Set<Field> fields = new HashSet<>();
@@ -81,9 +85,7 @@ public class MongoSequenceServiceImpl extends AbstractSequenceService {
 
     @Override
     public Long getCurrentSequence(String sequenceName, SequenceType sequenceType, boolean recycle) {
-        Query query = new Query();
-        query.addCriteria(Criteria.where(MongoSequenceEntity.Fields.seq).is(sequenceName));
-        MongoSequenceEntity entity = this.template.findOne(query, MongoSequenceEntity.class);
+        MongoSequenceEntity entity = this.repository.findByField(new ModelQueryDto(List.of(new QueryModelDto(MongoSequenceEntity.Fields.seq, QueryCondition.IS, sequenceName))));
         if (ObjectUtils.isEmpty(entity)) {
             entity = new MongoSequenceEntity();
             entity.setSeq(sequenceName);
@@ -98,7 +100,7 @@ public class MongoSequenceServiceImpl extends AbstractSequenceService {
             throw new BusinessException("S0001", "No more sequence for this transaction.");
         }*/
         entity.setCurrent(entity.getCurrent() + entity.getIncrement());
-        this.template.save(entity);
+        this.repository.create(entity);
         return entity.getCurrent();
     }
 }

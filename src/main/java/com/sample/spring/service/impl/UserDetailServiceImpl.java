@@ -4,6 +4,7 @@ import com.sample.spring.common.exception.BizException;
 import com.sample.spring.dto.UserDto;
 import com.sample.spring.entity.UserEntity;
 import com.sample.spring.enums.BizErrorCode;
+import com.sample.spring.enums.StatusType;
 import com.sample.spring.mapper.UserMapper;
 import com.sample.spring.repository.UserRepository;
 import com.sample.spring.service.UserService;
@@ -37,6 +38,7 @@ public class UserDetailServiceImpl implements UserService {
         if (ObjectUtils.isNotEmpty(entity))
             throw new BizException(BizErrorCode.E0003, String.format("This username %s %s", dto.getUsername(), "already existed."));
         entity = UserMapper.INSTANCE.dtoToEntity(dto);
+        entity.setStatus(String.valueOf(StatusType.ACTIVE));
         this.repository.save(entity);
         return UserMapper.INSTANCE.entityToDto(entity);
     }
