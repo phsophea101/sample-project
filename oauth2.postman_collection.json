@@ -1,0 +1,125 @@
+{
+	"info": {
+		"_postman_id": "1516fc67-ce37-4f96-a107-eb7638e5ab37",
+		"name": "oauth2",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "9801523",
+		"_collection_link": "https://lunar-firefly-515904.postman.co/workspace/demo~c459b6e7-2ef5-4aac-bb4a-ec24648b613b/collection/9801523-1516fc67-ce37-4f96-a107-eb7638e5ab37?action=share&source=collection_link&creator=9801523"
+	},
+	"item": [
+		{
+			"name": "oauth token",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "authority",
+						"value": "dev-eco-gateway.wingecosys.com"
+					},
+					{
+						"key": "accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "accept-language",
+						"value": "en"
+					},
+					{
+						"key": "api-version",
+						"value": "v1"
+					},
+					{
+						"key": "app-version",
+						"value": "0.1.0"
+					},
+					{
+						"key": "authorization",
+						"value": "null"
+					},
+					{
+						"key": "origin",
+						"value": "https://hotfix-0-0-0-market-agri-portal.wingecosys.com"
+					},
+					{
+						"key": "referer",
+						"value": "https://hotfix-0-0-0-market-agri-portal.wingecosys.com/"
+					},
+					{
+						"key": "sec-ch-ua",
+						"value": "\"Chromium\";v=\"110\", \"Not A(Brand\";v=\"24\", \"Microsoft Edge\";v=\"110\""
+					},
+					{
+						"key": "sec-ch-ua-mobile",
+						"value": "?0"
+					},
+					{
+						"key": "sec-ch-ua-platform",
+						"value": "\"Windows\""
+					},
+					{
+						"key": "sec-fetch-dest",
+						"value": "empty"
+					},
+					{
+						"key": "sec-fetch-mode",
+						"value": "cors"
+					},
+					{
+						"key": "sec-fetch-site",
+						"value": "same-site"
+					},
+					{
+						"key": "user-agent",
+						"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.41"
+					},
+					{
+						"key": "wing-platform",
+						"value": "AGRI"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "username",
+							"value": "admin.sophea",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "LB9nRmM6OBGMbLQ2aGLdX/0w3v3nVkWc4+C9b1xru7yp7Atnf2xgZ/BzBG3kYI+bCl7VUFrzBs1aJ8NrDoemOqS4SHk9ANDjbHXfBizQFbSdB104+36QojnUYfjSFFlNemGdAaNChURPvE/mh+2L/2I2n6u3JT5OydVMyMBfvEvoN0mz+x9IDbSRSQFt7rnonFUZDzHXIWKkkLd7e3Bd/tkoy+HcnEAVqxFBTbI2mlLSk0yJXPtPkElionmK/tBNAIgmXLxr9JnSKxhUlbaMIeFcQbL1jEMQUitXNkb7KgsF3iguB513hxCsLqeO09EH9FIVlqpe+URcP5ziMU0R4Q==",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "wingagri_web",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "Rmebc+E7Ws7rdudfPwkdqBziYyxxXEoDmMaH9puwphvGHAc9pH/AE5NoXPEZIxHdfH4+pfJ8Cw1DCSMjEUb2WdJ6Rap/5KMFc6rOBrA9ymZQPBC/PZaXbY+PuJobR93JbQYoq3CoqipV2OKchWblVDH/8TyI1Et6EbcqTnT0Ob51bmcI6NNHy53s1gFM4zXco0/w3phXRhbaKt0P8ZP9ioI4JXS+EiYvf1CFalJG0W+JLqqXkhRVAzyRT2xVbg3GiUji+Iy/AkaN+6sJ+wGcUUzxX3N+RLGj4CcsXfeUtCNR7oN4S80DXxest6JnF9LI2S+fa67rCrHUt/AZWmbDng==",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:8080/oauth/token",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"oauth",
+						"token"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
